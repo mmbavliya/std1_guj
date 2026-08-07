@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ગુજરાતી ધોરણ ૧ - પાઠ્યપુસ્તક & ડિજિટલ સ્વાધ્યાય પોથી</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-main: #0b0f19;
+            --bg-card: #151d2a;
+            --bg-sidebar: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #273549;
+            --accent: #06b6d4;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Hind Vadodara', 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Sidebar Tree View */
+        .sidebar {
+            width: 340px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.25rem 1rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            padding: 0 0.5rem;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: white;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);
+        }
+
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .search-box {
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .tree-section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin: 0.8rem 0 0.5rem 0.5rem;
+            font-weight: 600;
+        }
+
+        .tree-unit-header {
+            padding: 0.65rem 0.8rem;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--accent);
+            cursor: pointer;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s, border-color 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .tree-unit-header:hover {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .tree-unit-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tree-toggle-icon {
+            font-size: 0.75rem;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .tree-toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .tree-subitems {
+            padding-left: 0.75rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .tree-subitems.hidden {
+            display: none;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .tree-item:hover, .tree-item.active {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border-left: 3px solid var(--accent);
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .done-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #080c14;
+        }
+
+        .topbar {
+            height: 65px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            background: var(--bg-sidebar);
+        }
+
+        .unit-pill {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .stats-pill {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-toggle-tools {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-toggle-tools.active-mode {
+            background: rgba(79, 70, 229, 0.25);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.4);
+        }
+
+        .btn-toggle-tools.inactive-mode {
+            background: rgba(245, 158, 11, 0.25);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        /* Gallery Grid Area */
+        .content-area {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-color: var(--accent);
+        }
+
+        .card.has-exercise {
+            border-color: var(--accent-green);
+        }
+
+        .card-badge-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+        }
+
+        .card-img-wrap {
+            width: 100%;
+            height: 230px;
+            background: #fff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-img-wrap img {
+            transform: scale(1.03);
+        }
+
+        .card-body {
+            padding: 0.9rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-tag {
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .card-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* Modal / Studio Area */
+        .studio-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 8, 15, 0.96);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+        }
+
+        .studio-modal.active {
+            display: flex;
+        }
+
+        .studio-header {
+            height: 60px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.25rem;
+        }
+
+        .studio-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .studio-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: var(--accent);
+        }
+
+        .btn-action.btn-save {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-action.btn-save:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-close {
+            background: #ef4444;
+            border: none;
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .btn-close:hover {
+            transform: scale(1.1);
+        }
+
+        /* Tool Rack */
+        .studio-tool-rack {
+            background: #111827;
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tools-inactive .studio-tool-rack,
+        .tools-inactive .gujarati-keyboard-bar {
+            display: none !important;
+        }
+
+        .tool-section {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-right: 1px solid var(--border-color);
+            padding-right: 12px;
+        }
+
+        .tool-section:last-child {
+            border-right: none;
+        }
+
+        .tool-section-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .tool-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+        }
+
+        .color-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.15s;
+            flex-shrink: 0;
+        }
+
+        .color-dot:hover, .color-dot.active {
+            transform: scale(1.25);
+            border-color: white;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+        }
+
+        .stroke-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stroke-dot {
+            background: #94a3b8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .stroke-dot:hover, .stroke-dot.active {
+            background: var(--accent);
+            transform: scale(1.2);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .stamp-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .stamp-item {
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 3px 7px;
+            border-radius: 12px;
+            transition: transform 0.15s, background 0.15s;
+        }
+
+        .stamp-item:hover, .stamp-item.active {
+            transform: scale(1.3);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .toolbar-text-field {
+            padding: 4px 8px;
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+            width: 140px;
+            outline: none;
+        }
+
+        .toolbar-size-input {
+            width: 50px;
+            padding: 4px 6px;
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+            outline: none;
+            text-align: center;
+        }
+
+        /* Workspace Canvas Container */
+        .studio-workspace {
+            flex: 1;
+            display: flex;
+            overflow: auto;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            background: #060911;
+            padding: 1rem;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
+            border-radius: 4px;
+            background: white;
+            max-width: 95%;
+            max-height: 95%;
+            display: inline-block;
+        }
+
+        #bgImage {
+            display: block;
+            max-height: 74vh;
+            width: auto;
+            height: auto;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        #paintCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        #textLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Interactive Text Box Elements */
+        .interactive-text-box {
+            position: absolute;
+            pointer-events: all;
+            display: inline-flex;
+            align-items: center;
+            min-width: 28px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1.5px dashed #3b82f6;
+            border-radius: 6px;
+            padding: 1px 2px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+            user-select: none;
+        }
+
+        .interactive-text-box.selected {
+            border: 2px solid #ef4444;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 12;
+        }
+
+        .interactive-text-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Hind Vadodara', sans-serif;
+            font-weight: 700;
+            color: #1e40af;
+            line-height: 1.2;
+            padding: 1px 2px;
+            min-width: 24px;
+            box-sizing: content-box;
+        }
+
+        .text-box-drag-handle {
+            cursor: grab;
+            padding: 1px 3px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            user-select: none;
+        }
+
+        .text-box-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .text-box-resize-handle {
+            cursor: ew-resize;
+            padding: 0 3px;
+            color: #94a3b8;
+            display: none;
+            align-items: center;
+            font-size: 10px;
+            user-select: none;
+        }
+
+        .interactive-text-box.selected .text-box-resize-handle {
+            display: flex;
+        }
+
+        .text-box-resize-handle:hover {
+            color: #ef4444;
+        }
+
+        .text-box-delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin-left: 2px;
+        }
+
+        .interactive-text-box.selected .text-box-delete-btn {
+            display: flex;
+        }
+
+        /* Gujarati Keyboard Bar */
+        .gujarati-keyboard-bar {
+            background: #0f172a;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .guj-key-title {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        .guj-key {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .guj-key:hover {
+            background: var(--primary);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 220px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .main-container {
+                height: calc(100vh - 220px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar with Tree View -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">ગુ૧</div>
+            <div>
+                <div class="brand-title">ગુજરાતી ધોરણ ૧</div>
+                <div class="brand-subtitle">ડિજિટલ સ્વાધ્યાય પોથી</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 શોધો (પાનું અથવા એકમ)..." oninput="filterPages()">
+        </div>
+
+        <div class="tree-section-title">એકમ અને પાનાઓ (Tree View)</div>
+        <div id="treeContainer"></div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-container">
+        <div class="topbar">
+            <div class="unit-pill" id="currentFilterText">તમામ પાનાઓ (૧ થી ૭૧)</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="mainToggleToolsBtn" class="btn-toggle-tools active-mode" onclick="toggleToolsMode()">✏️ ટૂલ્સ: સક્રિય (ON)</button>
+                <div class="stats-pill" id="completedStats">✍️ પૂર્ણ સ્વાધ્યાય: ૦ / ૭૧</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="grid" id="galleryGrid"></div>
+        </div>
+    </div>
+
+    <!-- Interactive Studio Modal -->
+    <div class="studio-modal" id="studioModal">
+        <!-- 1. Top Navigation Bar -->
+        <div class="studio-header">
+            <div class="studio-title">
+                <span id="pageTitleText">પાનું ૧</span>
+            </div>
+            <div class="studio-controls">
+                <button class="btn-action" onclick="prevPage()">◀ અગાઉનું</button>
+                <button class="btn-action" onclick="nextPage()">આગળનું ▶</button>
+                <div class="zoom-controls" style="display: flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.06); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border-color);" title="પાનું ઝૂમ (Zoom)">
+                    <button class="btn-action" style="padding: 3px 8px; font-size: 0.8rem;" onclick="zoomOut()" title="ઝૂમ આઉટ (Zoom Out)">🔍-</button>
+                    <span id="zoomLevelDisplay" style="font-size: 0.82rem; font-weight: 700; color: var(--accent); min-width: 44px; text-align: center; cursor: pointer;" onclick="resetZoom()" title="ઝૂમ રીસેટ (100%)">100%</span>
+                    <button class="btn-action" style="padding: 3px 8px; font-size: 0.8rem;" onclick="zoomIn()" title="ઝૂમ ઇન (Zoom In)">🔎+</button>
+                </div>
+                <button id="btnToggleTools" class="btn-toggle-tools active-mode" onclick="toggleToolsMode()">✏️ ટૂલ્સ: સક્રિય (ON)</button>
+                <button class="btn-action action-write-btn" onclick="clearCanvas()">🗑️ સાફ કરો</button>
+                <button class="btn-action action-write-btn btn-save" onclick="saveExercise(true)">💾 સાચવો</button>
+                <button class="btn-action action-write-btn" onclick="downloadExercise()">📥 ડાઉનલોડ</button>
+                <button class="btn-action action-write-btn" onclick="printExercise()">🖨️ પ્રિન્ટ</button>
+                <button class="btn-close" onclick="closeStudio()">✕</button>
+            </div>
+        </div>
+
+        <!-- 2. Tool Rack -->
+        <div class="studio-tool-rack">
+            <!-- Tools Section -->
+            <div class="tool-section">
+                <span class="tool-section-label">સાધનો:</span>
+                <button class="tool-btn active" id="btnPen" onclick="setTool('pen')">✏️ પેન (Pen)</button>
+                <button class="tool-btn" id="btnLine" onclick="setTool('line')">📏 રેખા (Line)</button>
+                <button class="tool-btn" id="btnArrow" onclick="setTool('arrow')">🏹 તીર (Arrow)</button>
+                <button class="tool-btn" id="btnCircle" onclick="setTool('circle')">⭕ ગોળ (Circle)</button>
+                <button class="tool-btn" id="btnRect" onclick="setTool('rect')">🔲 બોક્સ (Box)</button>
+                <button class="tool-btn" id="btnHighlighter" onclick="setTool('highlighter')">🖍️ હાઇલાઇટર</button>
+                <button class="tool-btn" id="btnText" onclick="setTool('text')">🔤 લખાણ (Text)</button>
+                <button class="tool-btn" id="btnEraser" onclick="setTool('eraser')">🧹 રબર (Eraser)</button>
+                <button class="tool-btn" onclick="undoCanvas()" title="અગાઉનું સ્થાન (Undo)">↩️ Undo</button>
+            </div>
+
+            <!-- Text Field Section -->
+            <div class="tool-section" id="toolbarTextSection">
+                <span class="tool-section-label">લખાણ:</span>
+                <input type="text" id="toolbarTextInput" class="toolbar-text-field" placeholder="લખાણ લખો..." oninput="syncToolbarTextToCanvas(this.value)">
+                <span class="tool-section-label" style="margin-left: 4px;">સાઇઝ:</span>
+                <input type="number" id="toolbarFontSize" class="toolbar-size-input" value="28" min="10" max="100" step="2" oninput="syncToolbarFontSizeToCanvas(this.value)">
+                <span style="color: #94a3b8; font-size: 0.75rem;">px</span>
+            </div>
+
+            <!-- Color Palette Section -->
+            <div class="tool-section">
+                <span class="tool-section-label">કલર:</span>
+                <div class="color-dot active" style="background: #000000;" onclick="setColor('#000000', this)" title="કાળો"></div>
+                <div class="color-dot" style="background: #2563eb;" onclick="setColor('#2563eb', this)" title="વાદળી"></div>
+                <div class="color-dot" style="background: #dc2626;" onclick="setColor('#dc2626', this)" title="લાલ"></div>
+                <div class="color-dot" style="background: #16a34a;" onclick="setColor('#16a34a', this)" title="લીલો"></div>
+                <div class="color-dot" style="background: #9333ea;" onclick="setColor('#9333ea', this)" title="જાંબલી"></div>
+                <div class="color-dot" style="background: #ea580c;" onclick="setColor('#ea580c', this)" title="કેસરી"></div>
+                <input type="color" id="customColorPicker" style="width: 22px; height: 22px; border: none; border-radius: 50%; cursor: pointer; background: transparent;" onchange="setColor(this.value, this)" title="કસ્ટમ કલર">
+            </div>
+
+            <!-- Stroke Size Section -->
+            <div class="tool-section">
+                <span class="tool-section-label">સાઇઝ:</span>
+                <div class="stroke-picker">
+                    <div class="stroke-dot" style="width: 6px; height: 6px;" onclick="setLineWidth(3, this)" title="ઝીણું (3px)"></div>
+                    <div class="stroke-dot active" style="width: 11px; height: 11px;" onclick="setLineWidth(6, this)" title="મધ્યમ (6px)"></div>
+                    <div class="stroke-dot" style="width: 17px; height: 17px;" onclick="setLineWidth(14, this)" title="જાડું (14px)"></div>
+                </div>
+            </div>
+
+            <!-- Teacher Stamps Section -->
+            <div class="tool-section">
+                <span class="tool-section-label">સ્ટિકર્સ:</span>
+                <div class="stamp-selector">
+                    <span class="stamp-item" onclick="selectStamp('⭐')" title="સ્ટાર">⭐</span>
+                    <span class="stamp-item" onclick="selectStamp('✔️')" title="સાચું">✔️</span>
+                    <span class="stamp-item" onclick="selectStamp('❌')" title="ખોટું">❌</span>
+                    <span class="stamp-item" onclick="selectStamp('👏')" title="શાબાશ">👏</span>
+                    <span class="stamp-item" onclick="selectStamp('😊')" title="સરસ">😊</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Middle Workspace Canvas -->
+        <div class="studio-workspace" id="workspaceContainer">
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <img id="bgImage" src="" alt="Textbook Page">
+                <canvas id="paintCanvas"></canvas>
+                <div id="textLayer"></div>
+            </div>
+        </div>
+
+        <!-- 4. Bottom Gujarati Keyboard Bar -->
+        <div class="gujarati-keyboard-bar">
+            <span class="guj-key-title">ગુજરાતી મૂળાક્ષરો (૧ Tap Input):</span>
+            <button class="guj-key" onclick="insertGujLetter('ગ')">ગ</button>
+            <button class="guj-key" onclick="insertGujLetter('ન')">ન</button>
+            <button class="guj-key" onclick="insertGujLetter('મ')">મ</button>
+            <button class="guj-key" onclick="insertGujLetter('જ')">જ</button>
+            <span style="color: #475569;">|</span>
+            <button class="guj-key" onclick="insertGujLetter('વ')">વ</button>
+            <button class="guj-key" onclick="insertGujLetter('ર')">ર</button>
+            <button class="guj-key" onclick="insertGujLetter('સ')">સ</button>
+            <button class="guj-key" onclick="insertGujLetter('દ')">દ</button>
+            <span style="color: #475569;">|</span>
+            <button class="guj-key" onclick="insertGujLetter('ક')">ક</button>
+            <button class="guj-key" onclick="insertGujLetter('બ')">બ</button>
+            <button class="guj-key" onclick="insertGujLetter('અ')">અ</button>
+            <button class="guj-key" onclick="insertGujLetter('છ')">છ</button>
+            <span style="color: #475569;">|</span>
+            <button class="guj-key" onclick="insertGujLetter('પ')">પ</button>
+            <button class="guj-key" onclick="insertGujLetter('ડ')">ડ</button>
+            <button class="guj-key" onclick="insertGujLetter('ણ')">ણ</button>
+            <button class="guj-key" onclick="insertGujLetter('ત')">ત</button>
+            <span style="color: #475569;">|</span>
+            <button class="guj-key" onclick="insertGujLetter('લ')">લ</button>
+            <button class="guj-key" onclick="insertGujLetter('ટ')">ટ</button>
+            <button class="guj-key" onclick="insertGujLetter('ચ')">ચ</button>
+            <button class="guj-key" onclick="insertGujLetter('ળ')">ળ</button>
+            <span style="color: #475569;">|</span>
+            <button class="guj-key" onclick="insertGujLetter('૧')">૧</button>
+            <button class="guj-key" onclick="insertGujLetter('૨')">૨</button>
+            <button class="guj-key" onclick="insertGujLetter('૩')">૩</button>
+            <button class="guj-key" onclick="insertGujLetter('૪')">૪</button>
+            <button class="guj-key" onclick="insertGujLetter('૫')">૫</button>
+            <button class="guj-key" onclick="insertGujLetter('૬')">૬</button>
+            <button class="guj-key" onclick="insertGujLetter('૭')">૭</button>
+            <button class="guj-key" onclick="insertGujLetter('૮')">૮</button>
+            <button class="guj-key" onclick="insertGujLetter('૯')">૯</button>
+            <button class="guj-key" onclick="insertGujLetter('૧૦')">૧૦</button>
+        </div>
+    </div>
+
+    <script>
+        // 4 Chapter Definitions
+        const units = [
+            { 
+                id: 1, 
+                folder: 'ekm-1-ajb-gjb', 
+                name: 'એકમ ૧: અજબ ગજબ', 
+                count: 14, 
+                letters: 'ગ ન મ જ',
+                prefix: 'ekm-1-ajb-gjb--'
+            },
+            { 
+                id: 2, 
+                folder: 'ekm-2-vrsaadnii-mjaa', 
+                name: 'એકમ ૨: વરસાદની મજા', 
+                count: 18, 
+                letters: 'વ ર સ દ',
+                prefix: 'ekm-2-vrsaadnii-mjaa-'
+            },
+            { 
+                id: 3, 
+                folder: 'ekm-3-kaabrcklaankbutr', 
+                name: 'એકમ ૩: કાબરચકલાં ને કબૂતર', 
+                count: 20, 
+                letters: 'ક બ અ છ',
+                prefix: 'ekm-3-kaabrcklaankbutr-'
+            },
+            { 
+                id: 4, 
+                folder: 'ekm-4-ghr-ane-guphaa', 
+                name: 'એકમ ૪: ઘર અને ગુફા', 
+                count: 19, 
+                letters: 'પ ડ ણ ત લ ટ ચ ળ',
+                prefix: 'ekm-4-ghr-ane-guphaa-'
+            }
+        ];
+
+        // Build list of all 71 pages mapped to exact image files
+        const allPages = [];
+        let globalPageIndex = 1;
+
+        units.forEach(unit => {
+            unit.startPage = globalPageIndex;
+            for (let p = 1; p <= unit.count; p++) {
+                allPages.push({
+                    globalPage: globalPageIndex,
+                    unitId: unit.id,
+                    unitName: unit.name,
+                    unitFolder: unit.folder,
+                    chapterPage: p,
+                    title: `${unit.name} - પાનું ${p}`,
+                    src: `${unit.folder}/${unit.prefix}${p}.png`,
+                    desc: `મૂળાક્ષર: ${unit.letters}`
+                });
+                globalPageIndex++;
+            }
+            unit.endPage = globalPageIndex - 1;
+        });
+
+        let filteredPages = [...allPages];
+        let currentPageIndex = 0;
+        let isToolsActive = localStorage.getItem('guj_std1_tools_active') !== 'false';
+        let collapsedUnits = {};
+
+        // Drawing State
+        let currentTool = 'pen';
+        let currentColor = '#000000';
+        let currentLineWidth = 6;
+        let selectedStamp = '⭐';
+        let isDrawing = false;
+        let startX = 0, startY = 0, lastX = 0, lastY = 0;
+        let previewSnapshot = null;
+        let canvasHistory = [];
+        let activeInputBox = null;
+
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        const bgImg = document.getElementById('bgImage');
+
+        // Render Sidebar Tree View
+        function renderTree() {
+            const container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+
+            // 1. All Pages Header
+            const allBtn = document.createElement('div');
+            allBtn.className = 'tree-unit-header';
+            allBtn.style.color = '#fff';
+            allBtn.innerHTML = `
+                <div class="tree-unit-title">
+                    <span>📚 તમામ ૭૧ પાનાઓ</span>
+                </div>
+                <span class="badge">71</span>
+            `;
+            allBtn.onclick = () => showAllPages();
+            container.appendChild(allBtn);
+
+            // 2. Units Accordion Tree Nodes
+            units.forEach(unit => {
+                const header = document.createElement('div');
+                header.className = 'tree-unit-header';
+
+                const isCollapsed = !!collapsedUnits[unit.id];
+
+                header.innerHTML = `
+                    <div class="tree-unit-title">
+                        <span class="tree-toggle-icon ${isCollapsed ? 'collapsed' : ''}">▼</span>
+                        <span>${unit.name}</span>
+                    </div>
+                    <span class="badge">${unit.count} પાના</span>
+                `;
+
+                const subitems = document.createElement('div');
+                subitems.className = `tree-subitems ${isCollapsed ? 'hidden' : ''}`;
+
+                header.onclick = (e) => {
+                    collapsedUnits[unit.id] = !collapsedUnits[unit.id];
+                    renderTree();
+                    filterByUnit(unit.id);
+                };
+
+                const unitPages = allPages.filter(p => p.unitId === unit.id);
+                unitPages.forEach(p => {
+                    const hasDone = localStorage.getItem(`guj_std1_p${p.globalPage}`) !== null;
+                    const item = document.createElement('div');
+                    item.className = 'tree-item';
+                    item.innerHTML = `
+                        <span>📄 પાનું ${p.chapterPage}</span>
+                        ${hasDone ? '<span class="done-badge">✓ પૂર્ણ</span>' : ''}
+                    `;
+                    item.onclick = (e) => {
+                        e.stopPropagation();
+                        openStudioByGlobalPage(p.globalPage);
+                    };
+                    subitems.appendChild(item);
+                });
+
+                container.appendChild(header);
+                container.appendChild(subitems);
+            });
+
+            updateStats();
+        }
+
+        // Render Gallery Grid Cards
+        function renderGrid() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            filteredPages.forEach(p => {
+                const hasDone = localStorage.getItem(`guj_std1_p${p.globalPage}`) !== null;
+                const card = document.createElement('div');
+                card.className = `card ${hasDone ? 'has-exercise' : ''}`;
+                card.onclick = () => openStudioByGlobalPage(p.globalPage);
+
+                card.innerHTML = `
+                    ${hasDone ? '<div class="card-badge-status">✓ સ્વાધ્યાય પૂર્ણ</div>' : ''}
+                    <div class="card-img-wrap">
+                        <img src="${p.src}" alt="${p.title}" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <span class="card-tag">પાનું ${p.chapterPage}</span>
+                            <div class="card-title">${p.unitName}</div>
+                        </div>
+                        <div class="card-desc">${p.desc}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            let count = 0;
+            for (let i = 1; i <= allPages.length; i++) {
+                if (localStorage.getItem(`guj_std1_p${i}`) !== null) count++;
+            }
+            document.getElementById('completedStats').innerText = `✍️ પૂર્ણ સ્વાધ્યાય: ${count} / ${allPages.length}`;
+        }
+
+        function showAllPages() {
+            filteredPages = [...allPages];
+            document.getElementById('currentFilterText').innerText = `તમામ પાનાઓ (૧ થી ${allPages.length})`;
+            renderGrid();
+        }
+
+        function filterByUnit(unitId) {
+            const unit = units.find(u => u.id === unitId);
+            filteredPages = allPages.filter(p => p.unitId === unitId);
+            document.getElementById('currentFilterText').innerText = `${unit.name} (${unit.count} પાના)`;
+            renderGrid();
+        }
+
+        function filterPages() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) {
+                showAllPages();
+            } else {
+                filteredPages = allPages.filter(p => 
+                    p.globalPage.toString().includes(query) || 
+                    p.chapterPage.toString().includes(query) ||
+                    p.title.toLowerCase().includes(query) || 
+                    p.desc.toLowerCase().includes(query)
+                );
+                document.getElementById('currentFilterText').innerText = `શોધ પરિણામ: "${query}"`;
+            }
+            renderGrid();
+        }
+
+        // Zoom Management Functions
+        let zoomLevel = 1.0;
+
+        function setZoom(level) {
+            zoomLevel = Math.max(0.5, Math.min(3.0, Math.round(level * 100) / 100));
+            const wrapper = document.getElementById('canvasWrapper');
+            if (wrapper) {
+                wrapper.style.transform = `scale(${zoomLevel})`;
+                wrapper.style.transformOrigin = 'top center';
+                wrapper.style.transition = 'transform 0.2s ease-out';
+            }
+            const display = document.getElementById('zoomLevelDisplay');
+            if (display) {
+                display.innerText = `${Math.round(zoomLevel * 100)}%`;
+            }
+        }
+
+        function zoomIn() { setZoom(zoomLevel + 0.15); }
+        function zoomOut() { setZoom(zoomLevel - 0.15); }
+        function resetZoom() { setZoom(1.0); }
+
+        // Studio Modal Functions
+        function openStudioByGlobalPage(globalPageNum) {
+            currentPageIndex = filteredPages.findIndex(p => p.globalPage === globalPageNum);
+            if (currentPageIndex === -1) currentPageIndex = 0;
+            loadStudioPage();
+            updateToolsModeUI();
+            document.getElementById('studioModal').classList.add('active');
+        }
+
+        function closeStudio() {
+            saveExercise(false);
+            resetZoom();
+            document.getElementById('studioModal').classList.remove('active');
+            renderGrid();
+            renderTree();
+        }
+
+        function prevPage() {
+            saveExercise(false);
+            currentPageIndex = (currentPageIndex - 1 + filteredPages.length) % filteredPages.length;
+            loadStudioPage();
+        }
+
+        function nextPage() {
+            saveExercise(false);
+            currentPageIndex = (currentPageIndex + 1) % filteredPages.length;
+            loadStudioPage();
+        }
+
+        function loadStudioPage() {
+            removeActiveInput();
+            resetZoom();
+            const item = filteredPages[currentPageIndex];
+            document.getElementById('pageTitleText').innerText = `${item.title}`;
+
+            const onImageLoaded = () => {
+                initCanvasSize();
+                loadSavedDrawing(item.globalPage);
+            };
+
+            bgImg.onload = onImageLoaded;
+            bgImg.src = item.src;
+            if (bgImg.complete && bgImg.naturalWidth > 0) {
+                onImageLoaded();
+            }
+        }
+
+        function initCanvasSize() {
+            canvas.width = bgImg.naturalWidth || 600;
+            canvas.height = bgImg.naturalHeight || 800;
+            canvasHistory = [];
+            pushHistory();
+        }
+
+        function syncToolbarTextToCanvas(val) {
+            if (activeInputBox) {
+                activeInputBox.value = val;
+            }
+        }
+
+        function syncToolbarFontSizeToCanvas(val) {
+            const fontSize = parseInt(val) || 28;
+            if (activeInputBox) {
+                activeInputBox.style.fontSize = Math.min(Math.max(fontSize * 0.65, 14), 36) + 'px';
+            }
+        }
+
+        // Tool Selection
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.studio-tool-rack .tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.stamp-item').forEach(el => el.classList.remove('active'));
+
+            if (tool === 'pen') document.getElementById('btnPen').classList.add('active');
+            if (tool === 'line') document.getElementById('btnLine').classList.add('active');
+            if (tool === 'arrow') document.getElementById('btnArrow').classList.add('active');
+            if (tool === 'circle') document.getElementById('btnCircle').classList.add('active');
+            if (tool === 'rect') document.getElementById('btnRect').classList.add('active');
+            if (tool === 'highlighter') document.getElementById('btnHighlighter').classList.add('active');
+            if (tool === 'text') {
+                document.getElementById('btnText').classList.add('active');
+                const tbInput = document.getElementById('toolbarTextInput');
+                if (tbInput) tbInput.focus();
+            }
+            if (tool === 'eraser') document.getElementById('btnEraser').classList.add('active');
+        }
+
+        function selectStamp(stamp) {
+            currentTool = 'stamp';
+            selectedStamp = stamp;
+            document.querySelectorAll('.studio-tool-rack .tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.stamp-item').forEach(el => el.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+        }
+
+        function setColor(color, element) {
+            currentColor = color;
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+            if (element && element.classList) element.classList.add('active');
+        }
+
+        function setLineWidth(width, element) {
+            currentLineWidth = width;
+            document.querySelectorAll('.stroke-dot').forEach(dot => dot.classList.remove('active'));
+            if (element && element.classList) element.classList.add('active');
+
+            const toolbarSizeInput = document.getElementById('toolbarFontSize');
+            if (toolbarSizeInput) {
+                if (width <= 3) toolbarSizeInput.value = 20;
+                else if (width <= 6) toolbarSizeInput.value = 28;
+                else toolbarSizeInput.value = 44;
+            }
+        }
+
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY,
+                cssX: clientX - rect.left,
+                cssY: clientY - rect.top
+            };
+        }
+
+        // Canvas Drawing Events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function startDrawing(e) {
+            if (!isToolsActive) return;
+            const coords = getCanvasCoords(e);
+
+            if (currentTool === 'text') {
+                createInteractiveTextBox(coords.cssX, coords.cssY);
+                return;
+            }
+
+            if (currentTool === 'stamp') {
+                ctx.font = `${currentLineWidth * 6 + 24}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(selectedStamp, coords.x, coords.y);
+                pushHistory();
+                autoSaveDebounced();
+                return;
+            }
+
+            isDrawing = true;
+            startX = coords.x;
+            startY = coords.y;
+            lastX = coords.x;
+            lastY = coords.y;
+
+            if (['line', 'arrow', 'circle', 'rect'].includes(currentTool)) {
+                previewSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing || !isToolsActive) return;
+            const coords = getCanvasCoords(e);
+
+            ctx.globalCompositeOperation = 'source-over';
+
+            if (['line', 'arrow', 'circle', 'rect'].includes(currentTool)) {
+                if (previewSnapshot) ctx.putImageData(previewSnapshot, 0, 0);
+
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentLineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                if (currentTool === 'line') {
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(coords.x, coords.y);
+                    ctx.stroke();
+                } else if (currentTool === 'arrow') {
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(coords.x, coords.y);
+                    ctx.stroke();
+
+                    const angle = Math.atan2(coords.y - startY, coords.x - startX);
+                    const headLen = currentLineWidth * 3 + 12;
+                    ctx.beginPath();
+                    ctx.moveTo(coords.x, coords.y);
+                    ctx.lineTo(coords.x - headLen * Math.cos(angle - Math.PI / 6), coords.y - headLen * Math.sin(angle - Math.PI / 6));
+                    ctx.moveTo(coords.x, coords.y);
+                    ctx.lineTo(coords.x - headLen * Math.cos(angle + Math.PI / 6), coords.y - headLen * Math.sin(angle + Math.PI / 6));
+                    ctx.stroke();
+                } else if (currentTool === 'rect') {
+                    ctx.beginPath();
+                    ctx.rect(startX, startY, coords.x - startX, coords.y - startY);
+                    ctx.stroke();
+                } else if (currentTool === 'circle') {
+                    const rx = Math.abs(coords.x - startX) / 2;
+                    const ry = Math.abs(coords.y - startY) / 2;
+                    const cx = Math.min(startX, coords.x) + rx;
+                    const cy = Math.min(startY, coords.y) + ry;
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, Math.max(rx, 1), Math.max(ry, 1), 0, 0, 2 * Math.PI);
+                    ctx.stroke();
+                }
+                return;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(coords.x, coords.y);
+
+            if (currentTool === 'pen') {
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentLineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            } else if (currentTool === 'highlighter') {
+                ctx.strokeStyle = currentColor + '66';
+                ctx.lineWidth = currentLineWidth * 3.5;
+                ctx.lineCap = 'square';
+                ctx.stroke();
+            } else if (currentTool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = currentLineWidth * 4;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+
+            lastX = coords.x;
+            lastY = coords.y;
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                previewSnapshot = null;
+                ctx.globalCompositeOperation = 'source-over';
+                pushHistory();
+                autoSaveDebounced();
+            }
+        }
+
+        // Interactive Draggable & Resizable Text Boxes
+        function deselectAllTextBoxes() {
+            document.querySelectorAll('.interactive-text-box').forEach(b => b.classList.remove('selected'));
+            activeInputBox = null;
+        }
+
+        function removeActiveInput() {
+            deselectAllTextBoxes();
+        }
+
+        function adjustInputWidth(inputEl, customWidthPx = null) {
+            if (customWidthPx) {
+                inputEl.style.width = customWidthPx + 'px';
+                inputEl.dataset.manualResized = 'true';
+                return;
+            }
+            const val = inputEl.value || '..';
+            const toolbarSizeInput = document.getElementById('toolbarFontSize');
+            const fontSize = parseInt(inputEl.style.fontSize) || (toolbarSizeInput ? parseInt(toolbarSizeInput.value) : 24) || 24;
+            const charWidth = Math.max(12, fontSize * 0.65);
+            const neededWidth = Math.max(22, Math.ceil(val.length * charWidth) + 6);
+            inputEl.style.width = neededWidth + 'px';
+        }
+
+        function createInteractiveTextBox(x, y, initialText = '', initialId = null, initialWidth = null) {
+            const textLayer = document.getElementById('textLayer');
+            if (!textLayer) return;
+
+            const boxId = initialId || 'tb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            const wrapper = document.getElementById('canvasWrapper');
+            const rect = wrapper.getBoundingClientRect();
+            const xPct = (x / rect.width) * 100;
+            const yPct = (y / rect.height) * 100;
+
+            deselectAllTextBoxes();
+
+            const boxEl = document.createElement('div');
+            boxEl.className = 'interactive-text-box selected';
+            boxEl.dataset.id = boxId;
+            boxEl.style.left = Math.max(0, Math.min(95, xPct)) + '%';
+            boxEl.style.top = Math.max(0, Math.min(98, yPct)) + '%';
+
+            boxEl.addEventListener('mousedown', (e) => e.stopPropagation());
+            boxEl.addEventListener('click', (e) => {
+                document.querySelectorAll('.interactive-text-box').forEach(b => b.classList.remove('selected'));
+                boxEl.classList.add('selected');
+                activeInputBox = inputEl;
+                inputEl.focus();
+                e.stopPropagation();
+            });
+
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'text-box-drag-handle';
+            dragHandle.innerHTML = '⠿';
+            dragHandle.title = 'ખસેડો (Drag)';
+
+            const toolbarSizeInput = document.getElementById('toolbarFontSize');
+            const currentFontSize = toolbarSizeInput ? (parseInt(toolbarSizeInput.value) || 24) : 24;
+
+            const inputEl = document.createElement('input');
+            inputEl.type = 'text';
+            inputEl.className = 'interactive-text-input';
+            inputEl.value = initialText;
+            inputEl.style.fontSize = currentFontSize + 'px';
+            inputEl.style.color = currentColor;
+
+            adjustInputWidth(inputEl, initialWidth);
+
+            inputEl.onfocus = () => {
+                document.querySelectorAll('.interactive-text-box').forEach(b => {
+                    if (b !== boxEl) b.classList.remove('selected');
+                });
+                boxEl.classList.add('selected');
+                activeInputBox = inputEl;
+                const tbInput = document.getElementById('toolbarTextInput');
+                if (tbInput) tbInput.value = inputEl.value;
+            };
+
+            inputEl.oninput = () => {
+                if (!inputEl.dataset.manualResized) adjustInputWidth(inputEl);
+                const tbInput = document.getElementById('toolbarTextInput');
+                if (tbInput) tbInput.value = inputEl.value;
+                autoSaveDebounced();
+            };
+
+            inputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    inputEl.blur();
+                    boxEl.classList.remove('selected');
+                    autoSaveDebounced();
+                }
+            });
+
+            inputEl.onblur = () => {
+                autoSaveDebounced();
+            };
+
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'text-box-resize-handle';
+            resizeHandle.innerHTML = '⬌';
+            resizeHandle.title = 'પહોળાઈ બદલો';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'text-box-delete-btn';
+            deleteBtn.innerHTML = '✕';
+            deleteBtn.title = 'કાઢી નાખો';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                boxEl.remove();
+                if (activeInputBox === inputEl) activeInputBox = null;
+                autoSaveDebounced();
+            };
+
+            makeTextBoxDraggable(boxEl, dragHandle);
+            makeTextBoxResizable(boxEl, inputEl, resizeHandle);
+
+            boxEl.appendChild(dragHandle);
+            boxEl.appendChild(inputEl);
+            boxEl.appendChild(resizeHandle);
+            boxEl.appendChild(deleteBtn);
+
+            textLayer.appendChild(boxEl);
+            activeInputBox = inputEl;
+            inputEl.focus();
+        }
+
+        function makeTextBoxDraggable(boxEl, handleEl) {
+            let isDragging = false;
+            let startX, startY, startLeftPct, startTopPct;
+
+            const wrapper = document.getElementById('canvasWrapper');
+
+            const onStart = (clientX, clientY) => {
+                isDragging = true;
+                startX = clientX;
+                startY = clientY;
+                startLeftPct = parseFloat(boxEl.style.left) || 0;
+                startTopPct = parseFloat(boxEl.style.top) || 0;
+            };
+
+            const onMove = (clientX, clientY) => {
+                if (!isDragging) return;
+                const rect = wrapper.getBoundingClientRect();
+                const dxPct = ((clientX - startX) / rect.width) * 100;
+                const dyPct = ((clientY - startY) / rect.height) * 100;
+                boxEl.style.left = Math.max(0, Math.min(95, startLeftPct + dxPct)) + '%';
+                boxEl.style.top = Math.max(0, Math.min(98, startTopPct + dyPct)) + '%';
+            };
+
+            handleEl.addEventListener('mousedown', (e) => {
+                onStart(e.clientX, e.clientY);
+                e.stopPropagation();
+                e.preventDefault();
+                const onMM = (mE) => onMove(mE.clientX, mE.clientY);
+                const onMU = () => {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', onMM);
+                    window.removeEventListener('mouseup', onMU);
+                    autoSaveDebounced();
+                };
+                window.addEventListener('mousemove', onMM);
+                window.addEventListener('mouseup', onMU);
+            });
+
+            handleEl.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                const t = e.touches[0];
+                onStart(t.clientX, t.clientY);
+                e.stopPropagation();
+                const onTM = (tE) => { if (tE.touches.length === 1) onMove(tE.touches[0].clientX, tE.touches[0].clientY); };
+                const onTE = () => {
+                    isDragging = false;
+                    window.removeEventListener('touchmove', onTM);
+                    window.removeEventListener('touchend', onTE);
+                    autoSaveDebounced();
+                };
+                window.addEventListener('touchmove', onTM);
+                window.addEventListener('touchend', onTE);
+            });
+        }
+
+        function makeTextBoxResizable(boxEl, inputEl, handleEl) {
+            let isResizing = false;
+            let startX, startWidth;
+
+            handleEl.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startWidth = inputEl.offsetWidth;
+                inputEl.dataset.manualResized = 'true';
+                e.stopPropagation();
+                e.preventDefault();
+                const onRM = (mE) => {
+                    if (!isResizing) return;
+                    const dx = mE.clientX - startX;
+                    const newWidth = Math.max(20, startWidth + dx);
+                    inputEl.style.width = newWidth + 'px';
+                };
+                const onRU = () => {
+                    isResizing = false;
+                    window.removeEventListener('mousemove', onRM);
+                    window.removeEventListener('mouseup', onRU);
+                    autoSaveDebounced();
+                };
+                window.addEventListener('mousemove', onRM);
+                window.addEventListener('mouseup', onRU);
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.interactive-text-box') && !e.target.closest('.studio-tool-rack')) {
+                deselectAllTextBoxes();
+            }
+        });
+
+        function insertGujLetter(letter) {
+            if (activeInputBox) {
+                activeInputBox.value += letter;
+                adjustInputWidth(activeInputBox);
+                activeInputBox.focus();
+                autoSaveDebounced();
+            } else {
+                setTool('text');
+                const wrapper = document.getElementById('canvasWrapper');
+                const rect = wrapper.getBoundingClientRect();
+                createInteractiveTextBox(rect.width / 2, rect.height / 2, letter);
+            }
+        }
+
+        // History Management
+        function pushHistory() {
+            if (canvasHistory.length >= 15) canvasHistory.shift();
+            canvasHistory.push(canvas.toDataURL());
+        }
+
+        function undoCanvas() {
+            if (canvasHistory.length > 1) {
+                canvasHistory.pop();
+                const lastState = canvasHistory[canvasHistory.length - 1];
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    autoSaveDebounced();
+                };
+                img.src = lastState;
+            } else {
+                clearCanvas();
+            }
+        }
+
+        function clearCanvas() {
+            const pageNum = filteredPages[currentPageIndex] ? filteredPages[currentPageIndex].globalPage : null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const textLayer = document.getElementById('textLayer');
+            if (textLayer) textLayer.innerHTML = '';
+            canvasHistory = [];
+            pushHistory();
+            if (pageNum) {
+                localStorage.removeItem(`guj_std1_p${pageNum}`);
+                localStorage.removeItem(`guj_std1_text_p${pageNum}`);
+            }
+            saveExercise(false);
+        }
+
+        // Auto Save & Persistence
+        let saveTimer = null;
+        function autoSaveDebounced() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => saveExercise(false), 500);
+        }
+
+        function saveExercise(showNotification = true) {
+            if (!filteredPages[currentPageIndex]) return;
+            const pageNum = filteredPages[currentPageIndex].globalPage;
+            const dataUrl = canvas.toDataURL();
+
+            const emptyCanvas = document.createElement('canvas');
+            emptyCanvas.width = canvas.width;
+            emptyCanvas.height = canvas.height;
+
+            if (dataUrl === emptyCanvas.toDataURL()) {
+                localStorage.removeItem(`guj_std1_p${pageNum}`);
+            } else {
+                localStorage.setItem(`guj_std1_p${pageNum}`, dataUrl);
+            }
+
+            const textElements = [];
+            document.querySelectorAll('.interactive-text-box').forEach(box => {
+                const input = box.querySelector('.interactive-text-input');
+                if (input && input.value.trim()) {
+                    textElements.push({
+                        id: box.dataset.id,
+                        xPct: parseFloat(box.style.left) || 0,
+                        yPct: parseFloat(box.style.top) || 0,
+                        value: input.value,
+                        fontSize: parseInt(input.style.fontSize) || 24,
+                        color: input.style.color || '#1e40af',
+                        widthPx: input.offsetWidth
+                    });
+                }
+            });
+
+            if (textElements.length > 0) {
+                localStorage.setItem(`guj_std1_text_p${pageNum}`, JSON.stringify(textElements));
+            } else {
+                localStorage.removeItem(`guj_std1_text_p${pageNum}`);
+            }
+
+            if (showNotification) alert(`પાનું ${filteredPages[currentPageIndex].chapterPage} (${filteredPages[currentPageIndex].unitName}) ના સ્વાધ્યાય સાચવી લેવાયા છે! ✨`);
+            updateStats();
+        }
+
+        function loadSavedDrawing(pageNum) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const textLayer = document.getElementById('textLayer');
+            if (textLayer) textLayer.innerHTML = '';
+
+            const savedData = localStorage.getItem(`guj_std1_p${pageNum}`);
+            if (savedData) {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                    canvasHistory = [savedData];
+                };
+                img.src = savedData;
+            }
+
+            const savedTextRaw = localStorage.getItem(`guj_std1_text_p${pageNum}`);
+            if (savedTextRaw) {
+                try {
+                    const textElements = JSON.parse(savedTextRaw);
+                    const wrapper = document.getElementById('canvasWrapper');
+                    const rect = wrapper.getBoundingClientRect();
+                    textElements.forEach(tb => {
+                        const pixelX = (tb.xPct / 100) * rect.width;
+                        const pixelY = (tb.yPct / 100) * rect.height;
+                        createInteractiveTextBox(pixelX, pixelY, tb.value, tb.id, tb.widthPx);
+                    });
+                    setTimeout(() => deselectAllTextBoxes(), 100);
+                } catch (e) {
+                    console.error("Failed loading saved text:", e);
+                }
+            }
+        }
+
+        function drawTextBoxesToContext(tCtx, tempCanvas) {
+            document.querySelectorAll('.interactive-text-box').forEach(box => {
+                const input = box.querySelector('.interactive-text-input');
+                if (!input || !input.value.trim()) return;
+
+                const leftPct = parseFloat(box.style.left);
+                const topPct = parseFloat(box.style.top);
+                const fontSize = parseFloat(input.style.fontSize) || 24;
+                const x = (leftPct / 100) * tempCanvas.width + 4;
+                const y = (topPct / 100) * tempCanvas.height + fontSize;
+
+                tCtx.font = `700 ${input.style.fontSize || '24px'} 'Hind Vadodara', sans-serif`;
+                tCtx.fillStyle = input.style.color || '#1e40af';
+                tCtx.textBaseline = 'bottom';
+                tCtx.fillText(input.value, x, y);
+            });
+        }
+
+        function downloadExercise() {
+            const item = filteredPages[currentPageIndex];
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = bgImg.naturalWidth || 600;
+            tempCanvas.height = bgImg.naturalHeight || 800;
+            const tCtx = tempCanvas.getContext('2d');
+
+            tCtx.drawImage(bgImg, 0, 0, tempCanvas.width, tempCanvas.height);
+            tCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+            drawTextBoxesToContext(tCtx, tempCanvas);
+
+            const link = document.createElement('a');
+            link.download = `Guj_Std1_${item.unitFolder}_Page_${item.chapterPage}_Exercise.png`;
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function printExercise() {
+            const item = filteredPages[currentPageIndex];
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = bgImg.naturalWidth || 600;
+            tempCanvas.height = bgImg.naturalHeight || 800;
+            const tCtx = tempCanvas.getContext('2d');
+
+            tCtx.drawImage(bgImg, 0, 0, tempCanvas.width, tempCanvas.height);
+            tCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+            drawTextBoxesToContext(tCtx, tempCanvas);
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html>
+                    <head><title>પ્રિન્ટ - ${item.title}</title></head>
+                    <body style="margin:0; display:flex; justify-content:center; align-items:center;">
+                        <img src="${tempCanvas.toDataURL()}" style="max-width:100%; max-height:100vh;">
+                    </body>
+                </html>
+            `);
+            win.document.close();
+            setTimeout(() => { win.print(); win.close(); }, 500);
+        }
+
+        function updateToolsModeUI() {
+            const studioModal = document.getElementById('studioModal');
+            const btnToggle = document.getElementById('btnToggleTools');
+            const mainBtnToggle = document.getElementById('mainToggleToolsBtn');
+
+            if (isToolsActive) {
+                if (studioModal) studioModal.classList.remove('tools-inactive');
+                if (btnToggle) {
+                    btnToggle.className = 'btn-toggle-tools active-mode';
+                    btnToggle.innerHTML = '✏️ ટૂલ્સ: સક્રિય (ON)';
+                }
+                if (mainBtnToggle) {
+                    mainBtnToggle.className = 'btn-toggle-tools active-mode';
+                    mainBtnToggle.innerHTML = '✏️ ટૂલ્સ: સક્રિય (ON)';
+                }
+                document.querySelectorAll('.action-write-btn').forEach(btn => btn.style.display = 'inline-flex');
+            } else {
+                if (studioModal) studioModal.classList.add('tools-inactive');
+                removeActiveInput();
+                if (btnToggle) {
+                    btnToggle.className = 'btn-toggle-tools inactive-mode';
+                    btnToggle.innerHTML = '📖 વાંચન મોડ (ટૂલ્સ બંધ)';
+                }
+                if (mainBtnToggle) {
+                    mainBtnToggle.className = 'btn-toggle-tools inactive-mode';
+                    mainBtnToggle.innerHTML = '📖 વાંચન મોડ (ટૂલ્સ બંધ)';
+                }
+                document.querySelectorAll('.action-write-btn').forEach(btn => btn.style.display = 'none');
+            }
+        }
+
+        function toggleToolsMode() {
+            isToolsActive = !isToolsActive;
+            localStorage.setItem('guj_std1_tools_active', isToolsActive ? 'true' : 'false');
+            updateToolsModeUI();
+        }
+
+        // Mouse Wheel & Keyboard Shortcuts (Navigation & Zoom)
+        const workspace = document.getElementById('workspaceContainer');
+        if (workspace) {
+            workspace.addEventListener('wheel', (e) => {
+                const modal = document.getElementById('studioModal');
+                if (!modal.classList.contains('active')) return;
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    if (e.deltaY < 0) zoomIn(); else zoomOut();
+                }
+            }, { passive: false });
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('studioModal');
+            if (!modal.classList.contains('active')) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            if (e.key === 'ArrowLeft') prevPage();
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'Escape') closeStudio();
+            if (e.key === '+' || e.key === '=') zoomIn();
+            if (e.key === '-') zoomOut();
+            if (e.key === '0') resetZoom();
+        });
+
+        // Init App
+        renderTree();
+        renderGrid();
+        updateToolsModeUI();
+    </script>
+</body>
+</html>
