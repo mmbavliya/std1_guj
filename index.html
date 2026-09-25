@@ -27,7 +27,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Hind Vadodara', 'Inter', sans-serif;
+            font-family: 'Hind Vadodara', 'Inter', 'Shruti', 'Nirmala UI', sans-serif;
         }
 
         body {
@@ -443,6 +443,20 @@
             background: var(--primary-hover);
         }
 
+        .btn-action.speaking-active {
+            background: #059669 !important;
+            border-color: #34d399 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+            animation: pulse-speaking 1.4s infinite;
+        }
+
+        @keyframes pulse-speaking {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+
         .btn-close {
             background: #ef4444;
             border: none;
@@ -611,7 +625,7 @@
             align-items: center;
             justify-content: center;
             background: #060911;
-            padding: 1rem;
+            padding: 1.5rem;
         }
 
         .canvas-wrapper {
@@ -619,9 +633,8 @@
             box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
             border-radius: 4px;
             background: white;
-            max-width: 95%;
-            max-height: 95%;
             display: inline-block;
+            margin: auto;
         }
 
         #bgImage {
@@ -681,7 +694,7 @@
             background: transparent;
             border: none;
             outline: none;
-            font-family: 'Hind Vadodara', sans-serif;
+            font-family: 'Hind Vadodara', 'Shruti', 'Nirmala UI', sans-serif;
             font-weight: 700;
             color: #1e40af;
             line-height: 1.2;
@@ -692,12 +705,13 @@
 
         .text-box-drag-handle {
             cursor: grab;
-            padding: 1px 3px;
+            padding: 1px 4px;
             color: #64748b;
             display: flex;
             align-items: center;
-            font-size: 11px;
+            font-size: 12px;
             user-select: none;
+            touch-action: none;
         }
 
         .text-box-drag-handle:active {
@@ -706,12 +720,13 @@
 
         .text-box-resize-handle {
             cursor: ew-resize;
-            padding: 0 3px;
+            padding: 0 4px;
             color: #94a3b8;
             display: none;
             align-items: center;
-            font-size: 10px;
+            font-size: 11px;
             user-select: none;
+            touch-action: none;
         }
 
         .interactive-text-box.selected .text-box-resize-handle {
@@ -881,7 +896,7 @@
         <div class="studio-header">
             <div class="studio-title">
                 <span id="pageTitleText">પાનું ૧</span>
-                <button class="btn-action" style="padding: 2px 8px; font-size: 0.8rem;" onclick="speakCurrentPage()" title="પાનું સાંભળો (Speak)">🔊 બોલો</button>
+                <button id="speakPageBtn" class="btn-action" style="padding: 2px 8px; font-size: 0.8rem;" onclick="toggleSpeakCurrentPage()" title="પાનું સાંભળો / બંધ કરો (Speak / Stop)">🔊 બોલો</button>
             </div>
             <div class="studio-controls">
                 <button class="btn-action" onclick="prevPage()">◀ અગાઉનું</button>
@@ -1000,6 +1015,23 @@
             <button class="guj-key" onclick="insertGujLetter('ચ')">ચ</button>
             <button class="guj-key" onclick="insertGujLetter('ળ')">ળ</button>
             <span style="color: #475569;">|</span>
+            <!-- Additional Consonants -->
+            <button class="guj-key" onclick="insertGujLetter('ખ')">ખ</button>
+            <button class="guj-key" onclick="insertGujLetter('ઘ')">ઘ</button>
+            <button class="guj-key" onclick="insertGujLetter('ઝ')">ઝ</button>
+            <button class="guj-key" onclick="insertGujLetter('ઠ')">ઠ</button>
+            <button class="guj-key" onclick="insertGujLetter('ઢ')">ઢ</button>
+            <button class="guj-key" onclick="insertGujLetter('થ')">થ</button>
+            <button class="guj-key" onclick="insertGujLetter('ધ')">ધ</button>
+            <button class="guj-key" onclick="insertGujLetter('ફ')">ફ</button>
+            <button class="guj-key" onclick="insertGujLetter('ભ')">ભ</button>
+            <button class="guj-key" onclick="insertGujLetter('ય')">ય</button>
+            <button class="guj-key" onclick="insertGujLetter('શ')">શ</button>
+            <button class="guj-key" onclick="insertGujLetter('ષ')">ષ</button>
+            <button class="guj-key" onclick="insertGujLetter('હ')">હ</button>
+            <button class="guj-key" onclick="insertGujLetter('ક્ષ')">ક્ષ</button>
+            <button class="guj-key" onclick="insertGujLetter('જ્ઞ')">જ્ઞ</button>
+            <span style="color: #475569;">|</span>
             <!-- Matras -->
             <button class="guj-key guj-key-matra" onclick="insertGujLetter('ા')" title="કાનો">ા</button>
             <button class="guj-key guj-key-matra" onclick="insertGujLetter('િ')" title="હ્રસ્વ ઇ">િ</button>
@@ -1036,6 +1068,17 @@
     <div id="toastNotify" class="toast-notify">સ્વાધ્યાય સાચવી લેવાયા છે! ✨</div>
 
     <script>
+        // Gujarati Digits Converter
+        function toGujNum(num) {
+            const gujDigits = ['૦', '૧', '૨', '૩', '૪', '૫', '૬', '૭', '૮', '૯'];
+            return String(num).replace(/[0-9]/g, d => gujDigits[d]);
+        }
+
+        function fromGujNum(str) {
+            const gujDigits = {'૦':'0', '૧':'1', '૨':'2', '૩':'3', '૪':'4', '૫':'5', '૬':'6', '૭':'7', '૮':'8', '૯':'9'};
+            return String(str).replace(/[૦-૯]/g, d => gujDigits[d] || d);
+        }
+
         // 1. IndexedDB Storage Engine (Supports unlimited drawings across all 71 pages)
         const DB_NAME = 'GujStd1TextbookDB';
         const DB_VERSION = 1;
@@ -1043,7 +1086,7 @@
         let dbInstance = null;
 
         function openDatabase() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (dbInstance) return resolve(dbInstance);
                 if (!window.indexedDB) {
                     console.warn('IndexedDB not supported, falling back to localStorage');
@@ -1099,7 +1142,7 @@
                     const store = tx.objectStore(STORE_NAME);
                     const req = store.get(key);
                     req.onsuccess = () => {
-                        if (req.result !== undefined) {
+                        if (req.result !== undefined && req.result !== null) {
                             resolve(req.result);
                         } else {
                             resolve(localStorage.getItem(key));
@@ -1178,7 +1221,7 @@
                     unitName: unit.name,
                     unitFolder: unit.folder,
                     chapterPage: p,
-                    title: `${unit.name} - પાનું ${p}`,
+                    title: `${unit.name} - પાનું ${toGujNum(p)} (${p})`,
                     src: `${unit.folder}/${unit.prefix}${p}.png`,
                     desc: `મૂળાક્ષર: ${unit.letters}`
                 });
@@ -1199,6 +1242,7 @@
         let currentLineWidth = 6;
         let selectedStamp = '⭐';
         let isDrawing = false;
+        let hasDrawingStrokes = false;
         let startX = 0, startY = 0, lastX = 0, lastY = 0;
         let previewSnapshot = null;
         let canvasHistory = [];
@@ -1217,28 +1261,206 @@
             }
         }
 
-        // Gujarati Speech Synthesis
-        function speakText(text) {
+        // Gujarati Speech & Audio Engine (Supports Online Natural TTS + Offline Web Speech Fallback)
+        let currentAudio = null;
+        let speechQueue = [];
+        let isSpeakingState = false;
+        let activeUtterance = null;
+        let cachedVoices = [];
+
+        function initVoices() {
             if (!window.speechSynthesis) return;
+            cachedVoices = window.speechSynthesis.getVoices() || [];
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    cachedVoices = window.speechSynthesis.getVoices() || [];
+                };
+            }
+        }
+        initVoices();
+
+        function updateSpeakBtnState(isSpeaking) {
+            isSpeakingState = isSpeaking;
+            const speakBtn = document.getElementById('speakPageBtn');
+            if (speakBtn) {
+                if (isSpeaking) {
+                    speakBtn.innerHTML = '🔊 બોલે છે...';
+                    speakBtn.classList.add('speaking-active');
+                    speakBtn.title = 'અવાજ બંધ કરો (Stop Audio)';
+                } else {
+                    speakBtn.innerHTML = '🔊 બોલો';
+                    speakBtn.classList.remove('speaking-active');
+                    speakBtn.title = 'પાનું સાંભળો (Speak)';
+                }
+            }
+        }
+
+        function stopSpeech() {
+            speechQueue = [];
+            if (currentAudio) {
+                try {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    currentAudio.src = '';
+                } catch(e) {}
+                currentAudio = null;
+            }
+            if (window.speechSynthesis) {
+                try {
+                    window.speechSynthesis.cancel();
+                } catch(e) {}
+            }
+            updateSpeakBtnState(false);
+        }
+
+        function splitTextIntoChunks(text, maxLen = 140) {
+            if (!text || text.length <= maxLen) return [text];
+            const parts = text.split(/([,।\.\!\?\n]+)/);
+            const chunks = [];
+            let current = '';
+            for (let part of parts) {
+                if ((current + part).length > maxLen) {
+                    if (current.trim()) chunks.push(current.trim());
+                    current = part;
+                } else {
+                    current += part;
+                }
+            }
+            if (current.trim()) chunks.push(current.trim());
+            return chunks.length ? chunks : [text];
+        }
+
+        function speakText(text) {
+            if (!text || !text.trim()) return;
+            stopSpeech();
+
+            const chunks = splitTextIntoChunks(text.trim());
+            speechQueue = [...chunks];
+            playNextInQueue();
+        }
+
+        function playNextInQueue() {
+            if (!speechQueue.length) {
+                updateSpeakBtnState(false);
+                return;
+            }
+
+            const chunk = speechQueue.shift();
+            updateSpeakBtnState(true);
+
+            // Attempt 1: Online Google Translate TTS for natural Gujarati audio
+            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=gu&client=tw-ob&q=${encodeURIComponent(chunk)}`;
+            
+            const audio = new Audio();
+            currentAudio = audio;
+
+            let fallbackTriggered = false;
+            const triggerFallback = () => {
+                if (fallbackTriggered) return;
+                fallbackTriggered = true;
+                currentAudio = null;
+                // Try Web Speech fallback for this and remaining text
+                fallbackSpeechSynthesis(chunk, () => {
+                    playNextInQueue();
+                });
+            };
+
+            audio.onended = () => {
+                currentAudio = null;
+                playNextInQueue();
+            };
+
+            audio.onerror = () => {
+                triggerFallback();
+            };
+
+            // If audio fails to load or is stalled for more than 3.5 seconds, fallback
+            const timeoutId = setTimeout(() => {
+                if (audio.readyState === 0 && !fallbackTriggered) {
+                    triggerFallback();
+                }
+            }, 3500);
+
+            audio.oncanplay = () => {
+                clearTimeout(timeoutId);
+            };
+
+            audio.src = ttsUrl;
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch((err) => {
+                    console.warn('Audio play prevented or failed:', err);
+                    clearTimeout(timeoutId);
+                    triggerFallback();
+                });
+            }
+        }
+
+        function fallbackSpeechSynthesis(text, onComplete) {
+            if (!window.speechSynthesis) {
+                if (onComplete) onComplete();
+                else updateSpeakBtnState(false);
+                return;
+            }
+
             try {
                 window.speechSynthesis.cancel();
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.rate = 0.85;
-                const voices = window.speechSynthesis.getVoices();
-                const guVoice = voices.find(v => v.lang === 'gu-IN' || v.lang.startsWith('gu')) || 
-                                voices.find(v => v.lang === 'hi-IN' || v.lang.startsWith('hi'));
-                if (guVoice) utter.voice = guVoice;
-                utter.lang = guVoice ? guVoice.lang : 'gu-IN';
-                window.speechSynthesis.speak(utter);
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                }
+
+                activeUtterance = new SpeechSynthesisUtterance(text);
+                activeUtterance.rate = 0.85;
+
+                if (!cachedVoices.length) {
+                    cachedVoices = window.speechSynthesis.getVoices() || [];
+                }
+
+                const guVoice = cachedVoices.find(v => v.lang && (v.lang === 'gu-IN' || v.lang.toLowerCase().startsWith('gu')));
+                const hiVoice = cachedVoices.find(v => v.lang && (v.lang === 'hi-IN' || v.lang.toLowerCase().startsWith('hi')));
+                const inVoice = cachedVoices.find(v => v.lang && v.lang.toUpperCase().includes('IN'));
+                const defaultVoice = cachedVoices.find(v => v.default) || cachedVoices[0];
+
+                const chosenVoice = guVoice || hiVoice || inVoice || defaultVoice;
+                if (chosenVoice) {
+                    activeUtterance.voice = chosenVoice;
+                    activeUtterance.lang = chosenVoice.lang;
+                } else {
+                    activeUtterance.lang = 'gu-IN';
+                }
+
+                activeUtterance.onstart = () => updateSpeakBtnState(true);
+                activeUtterance.onend = () => {
+                    if (onComplete) onComplete();
+                    else updateSpeakBtnState(false);
+                };
+                activeUtterance.onerror = (e) => {
+                    console.warn('SpeechSynthesis error:', e);
+                    if (onComplete) onComplete();
+                    else updateSpeakBtnState(false);
+                };
+
+                window.speechSynthesis.speak(activeUtterance);
             } catch(e) {
-                console.warn('Speech synthesis error:', e);
+                console.warn('SpeechSynthesis exception:', e);
+                if (onComplete) onComplete();
+                else updateSpeakBtnState(false);
+            }
+        }
+
+        function toggleSpeakCurrentPage() {
+            if (isSpeakingState) {
+                stopSpeech();
+            } else {
+                speakCurrentPage();
             }
         }
 
         function speakCurrentPage() {
             if (filteredPages[currentPageIndex]) {
                 const item = filteredPages[currentPageIndex];
-                speakText(`${item.unitName}, પાનું નંબર ${item.chapterPage}. ${item.desc}`);
+                const textToSpeak = `${item.unitName}, પાનું નંબર ${toGujNum(item.chapterPage)}. ${item.desc}`;
+                speakText(textToSpeak);
             }
         }
 
@@ -1259,7 +1481,7 @@
             const count = completedPagesSet.size;
             const statsEl = document.getElementById('completedStats');
             if (statsEl) {
-                statsEl.innerText = `✍️ પૂર્ણ સ્વાધ્યાય: ${count} / ${allPages.length}`;
+                statsEl.innerText = `✍️ પૂર્ણ સ્વાધ્યાય: ${toGujNum(count)} / ${toGujNum(allPages.length)} (${count} / ${allPages.length})`;
             }
         }
 
@@ -1294,7 +1516,7 @@
                         <span class="tree-toggle-icon ${isCollapsed ? 'collapsed' : ''}">▼</span>
                         <span>${unit.name}</span>
                     </div>
-                    <span class="badge">${unit.count} પાના</span>
+                    <span class="badge">${toGujNum(unit.count)} પાના</span>
                 `;
 
                 const subitems = document.createElement('div');
@@ -1312,7 +1534,7 @@
                     const item = document.createElement('div');
                     item.className = 'tree-item';
                     item.innerHTML = `
-                        <span>📄 પાનું ${p.chapterPage}</span>
+                        <span>📄 પાનું ${toGujNum(p.chapterPage)} <small style="color:var(--text-muted);">(${p.chapterPage})</small></span>
                         ${hasDone ? '<span class="done-badge">✓ પૂર્ણ</span>' : ''}
                     `;
                     item.onclick = (e) => {
@@ -1346,7 +1568,7 @@
                     </div>
                     <div class="card-body">
                         <div>
-                            <span class="card-tag">પાનું ${p.chapterPage}</span>
+                            <span class="card-tag">પાનું ${toGujNum(p.chapterPage)}</span>
                             <div class="card-title">${p.unitName}</div>
                         </div>
                         <div class="card-desc">${p.desc}</div>
@@ -1358,7 +1580,7 @@
 
         function showAllPages() {
             filteredPages = [...allPages];
-            document.getElementById('currentFilterText').innerText = `તમામ પાનાઓ (૧ થી ${allPages.length})`;
+            document.getElementById('currentFilterText').innerText = `તમામ પાનાઓ (૧ થી ${toGujNum(allPages.length)})`;
             renderGrid();
         }
 
@@ -1366,24 +1588,27 @@
             const unit = units.find(u => u.id === unitId);
             if (!unit) return;
             filteredPages = allPages.filter(p => p.unitId === unitId);
-            document.getElementById('currentFilterText').innerText = `${unit.name} (${unit.count} પાના)`;
+            document.getElementById('currentFilterText').innerText = `${unit.name} (${toGujNum(unit.count)} પાના)`;
             renderGrid();
         }
 
         function filterPages() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!query) {
+            const rawQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!rawQuery) {
                 showAllPages();
-            } else {
-                filteredPages = allPages.filter(p => 
-                    p.globalPage.toString().includes(query) || 
-                    p.chapterPage.toString().includes(query) ||
-                    p.title.toLowerCase().includes(query) || 
-                    p.desc.toLowerCase().includes(query) ||
-                    p.unitName.toLowerCase().includes(query)
-                );
-                document.getElementById('currentFilterText').innerText = `શોધ પરિણામ: "${query}" (${filteredPages.length} પાના)`;
+                return;
             }
+            const normalizedQuery = fromGujNum(rawQuery);
+            filteredPages = allPages.filter(p => 
+                p.globalPage.toString().includes(normalizedQuery) || 
+                p.chapterPage.toString().includes(normalizedQuery) ||
+                toGujNum(p.globalPage).includes(rawQuery) ||
+                toGujNum(p.chapterPage).includes(rawQuery) ||
+                p.title.toLowerCase().includes(rawQuery) || 
+                p.desc.toLowerCase().includes(rawQuery) ||
+                p.unitName.toLowerCase().includes(rawQuery)
+            );
+            document.getElementById('currentFilterText').innerText = `શોધ પરિણામ: "${rawQuery}" (${toGujNum(filteredPages.length)} પાના)`;
             renderGrid();
         }
 
@@ -1395,7 +1620,7 @@
             const wrapper = document.getElementById('canvasWrapper');
             if (wrapper) {
                 wrapper.style.transform = `scale(${zoomLevel})`;
-                wrapper.style.transformOrigin = 'top center';
+                wrapper.style.transformOrigin = 'center center';
                 wrapper.style.transition = 'transform 0.2s ease-out';
             }
             const display = document.getElementById('zoomLevelDisplay');
@@ -1413,7 +1638,7 @@
             let idx = filteredPages.findIndex(p => p.globalPage === globalPageNum);
             if (idx === -1) {
                 filteredPages = [...allPages];
-                document.getElementById('currentFilterText').innerText = `તમામ પાનાઓ (૧ થી ${allPages.length})`;
+                document.getElementById('currentFilterText').innerText = `તમામ પાનાઓ (૧ થી ${toGujNum(allPages.length)})`;
                 idx = filteredPages.findIndex(p => p.globalPage === globalPageNum);
             }
             currentPageIndex = idx !== -1 ? idx : 0;
@@ -1423,6 +1648,7 @@
         }
 
         function closeStudio() {
+            stopSpeech();
             saveExercise(false);
             resetZoom();
             document.getElementById('studioModal').classList.remove('active');
@@ -1442,22 +1668,29 @@
             loadStudioPage();
         }
 
+        let currentActivePageId = null;
         function loadStudioPage() {
+            stopSpeech();
             removeActiveInput();
             resetZoom();
             const item = filteredPages[currentPageIndex];
             if (!item) return;
 
+            currentActivePageId = item.globalPage;
             document.getElementById('pageTitleText').innerText = `${item.title}`;
 
-            bgImg.onload = () => {
+            let pageLoaded = false;
+            const onReady = () => {
+                if (pageLoaded || currentActivePageId !== item.globalPage) return;
+                pageLoaded = true;
                 initCanvasSize();
                 loadSavedDrawing(item.globalPage);
             };
+
+            bgImg.onload = onReady;
             bgImg.src = item.src;
-            if (bgImg.complete && bgImg.naturalWidth > 0) {
-                initCanvasSize();
-                loadSavedDrawing(item.globalPage);
+            if (bgImg.complete && bgImg.naturalWidth > 0 && bgImg.src.endsWith(item.src)) {
+                onReady();
             }
         }
 
@@ -1466,6 +1699,7 @@
             canvas.height = bgImg.naturalHeight || 800;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvasHistory = [];
+            hasDrawingStrokes = false;
             pushHistory();
         }
 
@@ -1545,14 +1779,18 @@
             const rect = canvas.getBoundingClientRect();
             const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
             const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : (e.changedTouches ? e.changedTouches[0].clientY : e.clientY);
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+            const width = rect.width || 1;
+            const height = rect.height || 1;
+            const scaleX = canvas.width / width;
+            const scaleY = canvas.height / height;
             return {
                 x: (clientX - rect.left) * scaleX,
                 y: (clientY - rect.top) * scaleY,
                 strokeScale: scaleX,
                 cssX: clientX - rect.left,
-                cssY: clientY - rect.top
+                cssY: clientY - rect.top,
+                xPct: ((clientX - rect.left) / width) * 100,
+                yPct: ((clientY - rect.top) / height) * 100
             };
         }
 
@@ -1565,13 +1803,14 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); }, { passive: false });
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); }, { passive: false });
         canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
 
         function startDrawing(e) {
             if (!isToolsActive) return;
             const coords = getCanvasCoords(e);
 
             if (currentTool === 'text') {
-                createInteractiveTextBox(coords.cssX, coords.cssY);
+                createInteractiveTextBox(coords.xPct, coords.yPct);
                 return;
             }
 
@@ -1581,6 +1820,7 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(selectedStamp, coords.x, coords.y);
+                hasDrawingStrokes = true;
                 pushHistory();
                 autoSaveDebounced();
                 return;
@@ -1657,16 +1897,19 @@
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
                 ctx.stroke();
+                hasDrawingStrokes = true;
             } else if (currentTool === 'highlighter') {
                 ctx.strokeStyle = currentColor + '66';
                 ctx.lineWidth = scaledWidth * 3.5;
                 ctx.lineCap = 'square';
                 ctx.stroke();
+                hasDrawingStrokes = true;
             } else if (currentTool === 'eraser') {
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.lineWidth = scaledWidth * 4;
                 ctx.lineCap = 'round';
                 ctx.stroke();
+                hasDrawingStrokes = true;
             }
 
             lastX = coords.x;
@@ -1678,6 +1921,7 @@
                 isDrawing = false;
                 previewSnapshot = null;
                 ctx.globalCompositeOperation = 'source-over';
+                hasDrawingStrokes = true;
                 pushHistory();
                 autoSaveDebounced();
             }
@@ -1702,31 +1946,29 @@
             const val = inputEl.value || '..';
             const fontSize = parseInt(inputEl.style.fontSize) || 28;
             const charWidth = Math.max(14, fontSize * 0.7);
-            const neededWidth = Math.max(28, Math.ceil(val.length * charWidth) + 8);
+            const neededWidth = Math.max(28, Math.ceil(val.length * charWidth) + 12);
             inputEl.style.width = neededWidth + 'px';
         }
 
-        function createInteractiveTextBox(x, y, initialText = '', initialId = null, initialWidth = null, initialFontSize = null, initialColor = null) {
+        function createInteractiveTextBox(xPct, yPct, initialText = '', initialId = null, initialWidth = null, initialFontSize = null, initialColor = null) {
             const textLayer = document.getElementById('textLayer');
             if (!textLayer) return;
 
             const boxId = initialId || 'tb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            const wrapper = document.getElementById('canvasWrapper');
-            const rect = wrapper.getBoundingClientRect();
-            const xPct = (x / rect.width) * 100;
-            const yPct = (y / rect.height) * 100;
-
             deselectAllTextBoxes();
 
             const boxEl = document.createElement('div');
             boxEl.className = 'interactive-text-box selected';
             boxEl.dataset.id = boxId;
-            boxEl.style.left = Math.max(0, Math.min(92, xPct)) + '%';
-            boxEl.style.top = Math.max(0, Math.min(95, yPct)) + '%';
+            const safeLeft = Math.max(0, Math.min(92, isNaN(xPct) ? 10 : xPct));
+            const safeTop = Math.max(0, Math.min(95, isNaN(yPct) ? 10 : yPct));
+            boxEl.style.left = safeLeft + '%';
+            boxEl.style.top = safeTop + '%';
 
             boxEl.addEventListener('mousedown', (e) => e.stopPropagation());
+            boxEl.addEventListener('touchstart', (e) => e.stopPropagation());
             boxEl.addEventListener('click', (e) => {
-                document.querySelectorAll('.interactive-text-box').forEach(b => b.classList.remove('selected'));
+                deselectAllTextBoxes();
                 boxEl.classList.add('selected');
                 activeInputBox = inputEl;
                 inputEl.focus();
@@ -1751,9 +1993,7 @@
             adjustInputWidth(inputEl, initialWidth);
 
             inputEl.onfocus = () => {
-                document.querySelectorAll('.interactive-text-box').forEach(b => {
-                    if (b !== boxEl) b.classList.remove('selected');
-                });
+                deselectAllTextBoxes();
                 boxEl.classList.add('selected');
                 activeInputBox = inputEl;
                 const tbInput = document.getElementById('toolbarTextInput');
@@ -1794,7 +2034,11 @@
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
                 boxEl.remove();
-                if (activeInputBox === inputEl) activeInputBox = null;
+                if (activeInputBox === inputEl) {
+                    activeInputBox = null;
+                    const tbInput = document.getElementById('toolbarTextInput');
+                    if (tbInput) tbInput.value = '';
+                }
                 autoSaveDebounced();
             };
 
@@ -1808,7 +2052,11 @@
 
             textLayer.appendChild(boxEl);
             activeInputBox = inputEl;
-            inputEl.focus();
+            setTimeout(() => {
+                inputEl.focus();
+                const tbInput = document.getElementById('toolbarTextInput');
+                if (tbInput) tbInput.value = inputEl.value;
+            }, 50);
         }
 
         function makeTextBoxDraggable(boxEl, handleEl) {
@@ -1827,10 +2075,18 @@
             const onMove = (clientX, clientY) => {
                 if (!isDragging) return;
                 const rect = wrapper.getBoundingClientRect();
+                if (!rect.width || !rect.height) return;
                 const dxPct = ((clientX - startX) / rect.width) * 100;
                 const dyPct = ((clientY - startY) / rect.height) * 100;
                 boxEl.style.left = Math.max(0, Math.min(94, startLeftPct + dxPct)) + '%';
                 boxEl.style.top = Math.max(0, Math.min(96, startTopPct + dyPct)) + '%';
+            };
+
+            const onEnd = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    autoSaveDebounced();
+                }
             };
 
             handleEl.addEventListener('mousedown', (e) => {
@@ -1839,10 +2095,9 @@
                 e.preventDefault();
                 const onMM = (mE) => onMove(mE.clientX, mE.clientY);
                 const onMU = () => {
-                    isDragging = false;
+                    onEnd();
                     window.removeEventListener('mousemove', onMM);
                     window.removeEventListener('mouseup', onMU);
-                    autoSaveDebounced();
                 };
                 window.addEventListener('mousemove', onMM);
                 window.addEventListener('mouseup', onMU);
@@ -1855,42 +2110,71 @@
                 e.stopPropagation();
                 const onTM = (tE) => { if (tE.touches.length === 1) onMove(tE.touches[0].clientX, tE.touches[0].clientY); };
                 const onTE = () => {
-                    isDragging = false;
+                    onEnd();
                     window.removeEventListener('touchmove', onTM);
                     window.removeEventListener('touchend', onTE);
-                    autoSaveDebounced();
+                    window.removeEventListener('touchcancel', onTE);
                 };
-                window.addEventListener('touchmove', onTM);
+                window.addEventListener('touchmove', onTM, { passive: false });
                 window.addEventListener('touchend', onTE);
-            });
+                window.addEventListener('touchcancel', onTE);
+            }, { passive: false });
         }
 
         function makeTextBoxResizable(boxEl, inputEl, handleEl) {
             let isResizing = false;
             let startX, startWidth;
 
-            handleEl.addEventListener('mousedown', (e) => {
+            const onStart = (clientX) => {
                 isResizing = true;
-                startX = e.clientX;
+                startX = clientX;
                 startWidth = inputEl.offsetWidth;
                 inputEl.dataset.manualResized = 'true';
+            };
+
+            const onMove = (clientX) => {
+                if (!isResizing) return;
+                const dx = (clientX - startX) / (zoomLevel || 1.0);
+                const newWidth = Math.max(24, startWidth + dx);
+                inputEl.style.width = newWidth + 'px';
+            };
+
+            const onEnd = () => {
+                if (isResizing) {
+                    isResizing = false;
+                    autoSaveDebounced();
+                }
+            };
+
+            handleEl.addEventListener('mousedown', (e) => {
+                onStart(e.clientX);
                 e.stopPropagation();
                 e.preventDefault();
-                const onRM = (mE) => {
-                    if (!isResizing) return;
-                    const dx = mE.clientX - startX;
-                    const newWidth = Math.max(24, startWidth + dx);
-                    inputEl.style.width = newWidth + 'px';
-                };
+                const onRM = (mE) => onMove(mE.clientX);
                 const onRU = () => {
-                    isResizing = false;
+                    onEnd();
                     window.removeEventListener('mousemove', onRM);
                     window.removeEventListener('mouseup', onRU);
-                    autoSaveDebounced();
                 };
                 window.addEventListener('mousemove', onRM);
                 window.addEventListener('mouseup', onRU);
             });
+
+            handleEl.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                onStart(e.touches[0].clientX);
+                e.stopPropagation();
+                const onRTM = (tE) => { if (tE.touches.length === 1) onMove(tE.touches[0].clientX); };
+                const onRTE = () => {
+                    onEnd();
+                    window.removeEventListener('touchmove', onRTM);
+                    window.removeEventListener('touchend', onRTE);
+                    window.removeEventListener('touchcancel', onRTE);
+                };
+                window.addEventListener('touchmove', onRTM, { passive: false });
+                window.addEventListener('touchend', onRTE);
+                window.addEventListener('touchcancel', onRTE);
+            }, { passive: false });
         }
 
         window.addEventListener('click', (e) => {
@@ -1900,26 +2184,61 @@
         });
 
         function insertGujLetter(letter) {
-            if (activeInputBox) {
+            const tbInput = document.getElementById('toolbarTextInput');
+            if (document.activeElement === tbInput && tbInput) {
+                const start = tbInput.selectionStart || tbInput.value.length;
+                const end = tbInput.selectionEnd || tbInput.value.length;
+                const prevVal = tbInput.value;
+                tbInput.value = prevVal.substring(0, start) + letter + prevVal.substring(end);
+                tbInput.selectionStart = tbInput.selectionEnd = start + letter.length;
+                syncToolbarTextToCanvas(tbInput.value);
+                tbInput.focus();
+            } else if (activeInputBox) {
                 const start = activeInputBox.selectionStart || activeInputBox.value.length;
                 const end = activeInputBox.selectionEnd || activeInputBox.value.length;
                 const prevVal = activeInputBox.value;
                 activeInputBox.value = prevVal.substring(0, start) + letter + prevVal.substring(end);
                 activeInputBox.selectionStart = activeInputBox.selectionEnd = start + letter.length;
                 adjustInputWidth(activeInputBox);
+                if (tbInput) tbInput.value = activeInputBox.value;
                 activeInputBox.focus();
                 autoSaveDebounced();
             } else {
                 setTool('text');
-                const wrapper = document.getElementById('canvasWrapper');
-                const rect = wrapper.getBoundingClientRect();
-                createInteractiveTextBox(rect.width / 2, rect.height / 2, letter);
+                createInteractiveTextBox(40, 50, letter);
             }
-            if (letter.trim()) speakText(letter);
+            const matraSpokenMap = {
+                'ા': 'કાનો',
+                'િ': 'હ્રસ્વ ઇ',
+                'ી': 'દીર્ઘ ઈ',
+                'ુ': 'હ્રસ્વ ઉ',
+                'ૂ': 'દીર્ઘ ઊ',
+                'ે': 'એક માત્ર',
+                'ૈ': 'બે માત્ર',
+                'ો': 'કાનો માત્ર',
+                'ૌ': 'કાનો બે માત્ર',
+                'ં': 'અનુસ્વાર',
+                '્': 'હલંત'
+            };
+            const soundToPlay = matraSpokenMap[letter] || letter;
+            if (soundToPlay && soundToPlay.trim()) speakText(soundToPlay);
         }
 
         function backspaceGujLetter() {
-            if (activeInputBox && activeInputBox.value.length > 0) {
+            const tbInput = document.getElementById('toolbarTextInput');
+            if (document.activeElement === tbInput && tbInput && tbInput.value.length > 0) {
+                const start = tbInput.selectionStart;
+                const end = tbInput.selectionEnd;
+                if (start === end && start > 0) {
+                    tbInput.value = tbInput.value.substring(0, start - 1) + tbInput.value.substring(end);
+                    tbInput.selectionStart = tbInput.selectionEnd = start - 1;
+                } else if (start !== end) {
+                    tbInput.value = tbInput.value.substring(0, start) + tbInput.value.substring(end);
+                    tbInput.selectionStart = tbInput.selectionEnd = start;
+                }
+                syncToolbarTextToCanvas(tbInput.value);
+                tbInput.focus();
+            } else if (activeInputBox && activeInputBox.value.length > 0) {
                 const start = activeInputBox.selectionStart;
                 const end = activeInputBox.selectionEnd;
                 if (start === end && start > 0) {
@@ -1930,6 +2249,7 @@
                     activeInputBox.selectionStart = activeInputBox.selectionEnd = start;
                 }
                 adjustInputWidth(activeInputBox);
+                if (tbInput) tbInput.value = activeInputBox.value;
                 activeInputBox.focus();
                 autoSaveDebounced();
             }
@@ -1937,7 +2257,7 @@
 
         // History Management
         function pushHistory() {
-            if (canvasHistory.length >= 20) canvasHistory.shift();
+            if (canvasHistory.length >= 25) canvasHistory.shift();
             canvasHistory.push(canvas.toDataURL());
         }
 
@@ -1949,11 +2269,13 @@
                 img.onload = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0);
+                    hasDrawingStrokes = (canvasHistory.length > 1);
                     autoSaveDebounced();
                 };
                 img.src = lastState;
             } else {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                hasDrawingStrokes = false;
                 autoSaveDebounced();
             }
         }
@@ -1964,6 +2286,7 @@
             const textLayer = document.getElementById('textLayer');
             if (textLayer) textLayer.innerHTML = '';
             canvasHistory = [];
+            hasDrawingStrokes = false;
             pushHistory();
             if (pageNum) {
                 dbRemove(`guj_std1_p${pageNum}`);
@@ -1978,22 +2301,17 @@
         let saveTimer = null;
         function autoSaveDebounced() {
             clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => saveExercise(false), 600);
+            saveTimer = setTimeout(() => saveExercise(false), 500);
         }
 
         async function saveExercise(showNotification = true) {
             if (!filteredPages[currentPageIndex]) return;
             const pageNum = filteredPages[currentPageIndex].globalPage;
-            const dataUrl = canvas.toDataURL();
 
-            const emptyCanvas = document.createElement('canvas');
-            emptyCanvas.width = canvas.width;
-            emptyCanvas.height = canvas.height;
-            const isEmptyDrawing = (dataUrl === emptyCanvas.toDataURL());
-
-            if (isEmptyDrawing) {
+            if (!hasDrawingStrokes && canvasHistory.length <= 1) {
                 await dbRemove(`guj_std1_p${pageNum}`);
             } else {
+                const dataUrl = canvas.toDataURL();
                 await dbSet(`guj_std1_p${pageNum}`, dataUrl);
             }
 
@@ -2019,7 +2337,7 @@
                 await dbRemove(`guj_std1_text_p${pageNum}`);
             }
 
-            if (!isEmptyDrawing || textElements.length > 0) {
+            if (hasDrawingStrokes || textElements.length > 0) {
                 completedPagesSet.add(pageNum);
             } else {
                 completedPagesSet.delete(pageNum);
@@ -2028,7 +2346,7 @@
             updateStatsUI();
 
             if (showNotification) {
-                showToast(`પાનું ${filteredPages[currentPageIndex].chapterPage} ના સ્વાધ્યાય સાચવી લેવાયા છે! ✨`);
+                showToast(`પાનું ${toGujNum(filteredPages[currentPageIndex].chapterPage)} ના સ્વાધ્યાય સાચવી લેવાયા છે! ✨`);
             }
         }
 
@@ -2036,27 +2354,27 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const textLayer = document.getElementById('textLayer');
             if (textLayer) textLayer.innerHTML = '';
+            hasDrawingStrokes = false;
 
             const savedData = await dbGet(`guj_std1_p${pageNum}`);
             if (savedData) {
                 const img = new Image();
                 img.onload = () => {
                     ctx.drawImage(img, 0, 0);
+                    hasDrawingStrokes = true;
                     canvasHistory = [savedData];
                 };
                 img.src = savedData;
+            } else {
+                canvasHistory = [canvas.toDataURL()];
             }
 
             const savedTextRaw = await dbGet(`guj_std1_text_p${pageNum}`);
             if (savedTextRaw) {
                 try {
                     const textElements = JSON.parse(savedTextRaw);
-                    const wrapper = document.getElementById('canvasWrapper');
-                    const rect = wrapper.getBoundingClientRect();
                     textElements.forEach(tb => {
-                        const pixelX = (tb.xPct / 100) * rect.width;
-                        const pixelY = (tb.yPct / 100) * rect.height;
-                        createInteractiveTextBox(pixelX, pixelY, tb.value, tb.id, tb.widthPx, tb.fontSize, tb.color);
+                        createInteractiveTextBox(tb.xPct, tb.yPct, tb.value, tb.id, tb.widthPx, tb.fontSize, tb.color);
                     });
                     setTimeout(() => deselectAllTextBoxes(), 100);
                 } catch (e) {
@@ -2068,7 +2386,8 @@
         function drawTextBoxesToContext(tCtx, tempCanvas) {
             const wrapper = document.getElementById('canvasWrapper');
             const rect = wrapper ? wrapper.getBoundingClientRect() : null;
-            const scale = (rect && rect.width > 0) ? (tempCanvas.width / (rect.width / zoomLevel)) : (tempCanvas.width / 600);
+            const currentWrapperWidth = (rect && rect.width > 0) ? (rect.width / (zoomLevel || 1.0)) : (canvas.offsetWidth || 600);
+            const scale = tempCanvas.width / currentWrapperWidth;
 
             document.querySelectorAll('.interactive-text-box').forEach(box => {
                 const input = box.querySelector('.interactive-text-input');
@@ -2079,12 +2398,16 @@
                 const rawFontSize = parseFloat(input.style.fontSize) || 28;
                 const exportFontSize = rawFontSize * scale;
 
-                const x = (leftPct / 100) * tempCanvas.width + (4 * scale);
-                const y = (topPct / 100) * tempCanvas.height + exportFontSize;
+                const dragHandleEl = box.querySelector('.text-box-drag-handle');
+                const handleWidth = dragHandleEl ? dragHandleEl.offsetWidth : 16;
+                const offsetLeftCss = handleWidth + 2;
 
-                tCtx.font = `700 ${exportFontSize}px 'Hind Vadodara', sans-serif`;
+                const x = ((leftPct / 100) * currentWrapperWidth + offsetLeftCss) * scale;
+                const y = ((topPct / 100) * (tempCanvas.height / scale) + 4) * scale;
+
+                tCtx.font = `700 ${exportFontSize}px 'Hind Vadodara', 'Shruti', 'Nirmala UI', sans-serif`;
                 tCtx.fillStyle = input.style.color || '#1e40af';
-                tCtx.textBaseline = 'alphabetic';
+                tCtx.textBaseline = 'top';
                 tCtx.fillText(input.value, x, y);
             });
         }
